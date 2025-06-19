@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -10,6 +9,7 @@ const Navbar = () => {
   const navigation = [
     { name: "Home", href: "/" },
     { name: "Premade Designs", href: "/premade-designs" },
+    { name: "Custom Design", href: "/custom-design" },
   ];
 
   const isActive = (href: string) => location.pathname === href;

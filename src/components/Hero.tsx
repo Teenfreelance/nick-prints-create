@@ -54,12 +54,12 @@ Thank you!`;
             <Link to="/premade-designs" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200">
               Browse Designs
             </Link>
-            <button 
-              onClick={handleCustomOrderClick}
+            <Link 
+              to="/custom-design"
               className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-600 hover:text-white transition-all duration-200"
             >
               Custom Order
-            </button>
+            </Link>
           </div>
           
           <div className="animate-bounce">

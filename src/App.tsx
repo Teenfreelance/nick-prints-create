@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import PremadeDesigns from "./pages/PremadeDesigns";
+import CustomDesign from "./pages/CustomDesign";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 
@@ -22,6 +23,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/premade-designs" element={<PremadeDesigns />} />
+            <Route path="/custom-design" element={<CustomDesign />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
