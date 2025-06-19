@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import AdminLogin from "../components/AdminLogin";
 import AdminPanel from "../components/AdminPanel";
@@ -62,6 +61,24 @@ const PremadeDesigns = () => {
     setDesigns(newDesigns);
   };
 
+  const handleOrderClick = (design: typeof designs[0]) => {
+    const subject = `Order Request: ${design.name}`;
+    const body = `Hi Nick,
+
+I would like to order the following 3D print:
+
+Product: ${design.name}
+Price: ${design.price}
+Description: ${design.description}
+
+Please let me know the next steps for placing this order.
+
+Thank you!`;
+
+    const emailUrl = `mailto:grovesn094@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = emailUrl;
+  };
+
   return (
     <div className="min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -120,7 +137,10 @@ const PremadeDesigns = () => {
                 <p className="text-gray-600 mb-4">
                   {design.description}
                 </p>
-                <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200">
+                <button 
+                  onClick={() => handleOrderClick(design)}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                >
                   Order Now
                 </button>
               </div>

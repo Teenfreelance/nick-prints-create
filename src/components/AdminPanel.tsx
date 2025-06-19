@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Upload } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Design {
   id: number;
@@ -28,6 +29,29 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
     description: ""
   });
   const [showAddForm, setShowAddForm] = useState(false);
+  const { toast } = useToast();
+
+  const handleImageUpload = (file: File, isNewDesign: boolean = false, designId?: number) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageUrl = e.target?.result as string;
+      
+      if (isNewDesign) {
+        setNewDesign({...newDesign, image: imageUrl});
+      } else if (designId) {
+        onUpdateDesigns(
+          designs.map(d => d.id === designId ? { ...d, image: imageUrl } : d)
+        );
+        setEditingId(null);
+      }
+      
+      toast({
+        title: "Image uploaded successfully!",
+        description: "The image has been added to the design.",
+      });
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleAddDesign = () => {
     if (newDesign.name && newDesign.price) {
@@ -38,11 +62,20 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
       onUpdateDesigns([...designs, design]);
       setNewDesign({ name: "", price: "", image: "", description: "" });
       setShowAddForm(false);
+      toast({
+        title: "Design added successfully!",
+        description: `${design.name} has been added to your catalog.`,
+      });
     }
   };
 
   const handleDeleteDesign = (id: number) => {
+    const designToDelete = designs.find(d => d.id === id);
     onUpdateDesigns(designs.filter(d => d.id !== id));
+    toast({
+      title: "Design deleted",
+      description: `${designToDelete?.name} has been removed from your catalog.`,
+    });
   };
 
   const handleUpdateDesign = (id: number, updatedDesign: Partial<Design>) => {
@@ -50,6 +83,10 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
       designs.map(d => d.id === id ? { ...d, ...updatedDesign } : d)
     );
     setEditingId(null);
+    toast({
+      title: "Design updated",
+      description: "The design has been successfully updated.",
+    });
   };
 
   return (
@@ -93,13 +130,32 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
               />
             </div>
             <div>
-              <Label htmlFor="image">Image URL</Label>
-              <Input
-                id="image"
-                value={newDesign.image}
-                onChange={(e) => setNewDesign({...newDesign, image: e.target.value})}
-                placeholder="https://..."
-              />
+              <Label htmlFor="image">Image</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="image"
+                  value={newDesign.image}
+                  onChange={(e) => setNewDesign({...newDesign, image: e.target.value})}
+                  placeholder="https://... or upload below"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('new-design-upload')?.click()}
+                >
+                  <Upload size={16} />
+                </Button>
+                <input
+                  id="new-design-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file, true);
+                  }}
+                />
+              </div>
             </div>
             <div>
               <Label htmlFor="description">Description</Label>
@@ -132,6 +188,7 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
                 design={design} 
                 onSave={(updated) => handleUpdateDesign(design.id, updated)}
                 onCancel={() => setEditingId(null)}
+                onImageUpload={(file) => handleImageUpload(file, false, design.id)}
               />
             ) : (
               <>
@@ -165,10 +222,11 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
   );
 };
 
-const EditForm = ({ design, onSave, onCancel }: {
+const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
   design: Design;
   onSave: (design: Partial<Design>) => void;
   onCancel: () => void;
+  onImageUpload: (file: File) => void;
 }) => {
   const [editData, setEditData] = useState({
     name: design.name,
@@ -189,11 +247,31 @@ const EditForm = ({ design, onSave, onCancel }: {
         onChange={(e) => setEditData({...editData, price: e.target.value})}
         placeholder="Price"
       />
-      <Input
-        value={editData.image}
-        onChange={(e) => setEditData({...editData, image: e.target.value})}
-        placeholder="Image URL"
-      />
+      <div className="flex gap-2">
+        <Input
+          value={editData.image}
+          onChange={(e) => setEditData({...editData, image: e.target.value})}
+          placeholder="Image URL"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => document.getElementById(`edit-upload-${design.id}`)?.click()}
+        >
+          <Upload size={14} />
+        </Button>
+        <input
+          id={`edit-upload-${design.id}`}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onImageUpload(file);
+          }}
+        />
+      </div>
       <Input
         value={editData.description}
         onChange={(e) => setEditData({...editData, description: e.target.value})}
