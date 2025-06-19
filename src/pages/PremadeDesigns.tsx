@@ -1,10 +1,13 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import AdminLogin from "../components/AdminLogin";
 import AdminPanel from "../components/AdminPanel";
 
 const PremadeDesigns = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [designs, setDesigns] = useState([
+  
+  // Default designs that will always be present
+  const defaultDesigns = [
     {
       id: 1,
       name: "Robot Toy",
@@ -47,7 +50,30 @@ const PremadeDesigns = () => {
       image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=400&h=400&fit=crop",
       description: "Detailed miniature figurine perfect for gaming or display."
     }
-  ]);
+  ];
+
+  const [designs, setDesigns] = useState(defaultDesigns);
+
+  // Load designs from localStorage on component mount
+  useEffect(() => {
+    const savedDesigns = localStorage.getItem('premadeDesigns');
+    if (savedDesigns) {
+      try {
+        const parsedDesigns = JSON.parse(savedDesigns);
+        setDesigns(parsedDesigns);
+      } catch (error) {
+        console.error('Error parsing saved designs:', error);
+        // If there's an error, fall back to default designs
+        setDesigns(defaultDesigns);
+      }
+    }
+  }, []);
+
+  // Save designs to localStorage whenever designs change
+  const handleUpdateDesigns = (newDesigns: typeof designs) => {
+    setDesigns(newDesigns);
+    localStorage.setItem('premadeDesigns', JSON.stringify(newDesigns));
+  };
 
   const handleLogin = () => {
     setIsLoggedIn(true);
@@ -55,10 +81,6 @@ const PremadeDesigns = () => {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-  };
-
-  const handleUpdateDesigns = (newDesigns: typeof designs) => {
-    setDesigns(newDesigns);
   };
 
   const handleOrderClick = (design: typeof designs[0]) => {
