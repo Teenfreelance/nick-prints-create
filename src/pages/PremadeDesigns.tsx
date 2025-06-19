@@ -76,7 +76,7 @@ Please let me know the next steps for placing this order.
 Thank you!`;
 
     const emailUrl = `mailto:grovesn094@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = emailUrl;
+    window.open(emailUrl);
   };
 
   return (
