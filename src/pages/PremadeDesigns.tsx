@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import AdminLogin from "../components/AdminLogin";
 import AdminPanel from "../components/AdminPanel";
+
 const PremadeDesigns = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -86,7 +87,8 @@ Thank you!`;
     const emailUrl = `mailto:grovesn094@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(emailUrl);
   };
-  return <div className="min-h-screen py-12">
+  return (
+    <div className="min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -98,17 +100,22 @@ Thank you!`;
         </div>
 
         {/* Admin Section */}
-        {!isLoggedIn ? <div className="mb-8">
+        {!isLoggedIn ? (
+          <div className="mb-8">
             <details className="max-w-md mx-auto">
               <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700 text-center">
                 Owner Access
               </summary>
               <AdminLogin onLogin={handleLogin} />
             </details>
-          </div> : <AdminPanel designs={designs} onUpdateDesigns={handleUpdateDesigns} onLogout={handleLogout} />}
+          </div>
+        ) : (
+          <AdminPanel designs={designs} onUpdateDesigns={handleUpdateDesigns} onLogout={handleLogout} />
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {designs.map(design => <div key={design.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          {designs.map(design => (
+            <div key={design.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
               <div className="aspect-square overflow-hidden">
                 <img src={design.image} alt={design.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
               </div>
@@ -128,7 +135,8 @@ Thank you!`;
                   Order Now
                 </button>
               </div>
-            </div>)}
+            </div>
+          ))}
         </div>
 
         <div className="text-center mt-16">
@@ -145,6 +153,8 @@ Thank you!`;
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default PremadeDesigns;
