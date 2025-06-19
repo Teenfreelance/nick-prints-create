@@ -14,9 +14,30 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Create email with form data
+    const subject = `Quote Request from ${formData.name}`;
+    const body = `Hi Nick,
+
+I would like to request a quote for a 3D printing project:
+
+Name: ${formData.name}
+Email: ${formData.email}
+Project Type: ${formData.project || 'Not specified'}
+
+Project Details:
+${formData.message}
+
+Please provide a quote and timeline for this project.
+
+Thank you!`;
+
+    const emailUrl = `mailto:grovesn094@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(emailUrl);
+
     toast({
-      title: "Message Sent!",
-      description: "Thank you for your inquiry. We'll get back to you within 24 hours.",
+      title: "Quote Request Sent!",
+      description: "Your email client should open with the quote request. We'll get back to you within 24 hours.",
     });
     setFormData({ name: "", email: "", project: "", message: "" });
   };
@@ -183,7 +204,7 @@ const Contact = () => {
                 type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200"
               >
-                Send Message
+                Send Quote Request
               </button>
             </form>
 
