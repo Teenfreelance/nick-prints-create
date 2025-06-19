@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Edit, Trash2, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Design {
-  id: number;
+  id: string;
   name: string;
   price: string;
   image: string;
-  description: string;
+  description: string | null;
 }
 
 interface AdminPanelProps {
@@ -21,7 +23,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => {
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newDesign, setNewDesign] = useState({
     name: "",
     price: "",
@@ -30,19 +32,17 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
   });
   const [showAddForm, setShowAddForm] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const handleImageUpload = (file: File, isNewDesign: boolean = false, designId?: number) => {
+  const handleImageUpload = (file: File, isNewDesign: boolean = false, designId?: string) => {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const imageUrl = e.target?.result as string;
       
       if (isNewDesign) {
         setNewDesign({...newDesign, image: imageUrl});
       } else if (designId) {
-        onUpdateDesigns(
-          designs.map(d => d.id === designId ? { ...d, image: imageUrl } : d)
-        );
-        setEditingId(null);
+        await handleUpdateDesign(designId, { image: imageUrl });
       }
       
       toast({
@@ -53,40 +53,106 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
     reader.readAsDataURL(file);
   };
 
-  const handleAddDesign = () => {
+  const handleAddDesign = async () => {
     if (newDesign.name && newDesign.price) {
-      const design: Design = {
-        id: Math.max(...designs.map(d => d.id), 0) + 1,
-        ...newDesign
-      };
-      onUpdateDesigns([...designs, design]);
-      setNewDesign({ name: "", price: "", image: "", description: "" });
-      setShowAddForm(false);
+      try {
+        console.log('Adding new design:', newDesign);
+        const { data, error } = await supabase
+          .from('designs')
+          .insert([{
+            name: newDesign.name,
+            price: newDesign.price,
+            image: newDesign.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=400&fit=crop',
+            description: newDesign.description
+          }])
+          .select();
+
+        if (error) {
+          console.error('Error adding design:', error);
+          throw error;
+        }
+
+        console.log('Design added successfully:', data);
+        setNewDesign({ name: "", price: "", image: "", description: "" });
+        setShowAddForm(false);
+        queryClient.invalidateQueries({ queryKey: ['designs'] });
+        
+        toast({
+          title: "Design added successfully!",
+          description: `${newDesign.name} has been added to your catalog.`,
+        });
+      } catch (error) {
+        console.error('Failed to add design:', error);
+        toast({
+          title: "Error adding design",
+          description: "Failed to add the design to the database.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleDeleteDesign = async (id: string) => {
+    try {
+      console.log('Deleting design:', id);
+      const designToDelete = designs.find(d => d.id === id);
+      
+      const { error } = await supabase
+        .from('designs')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting design:', error);
+        throw error;
+      }
+
+      console.log('Design deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ['designs'] });
+      
       toast({
-        title: "Design added successfully!",
-        description: `${design.name} has been added to your catalog.`,
+        title: "Design deleted",
+        description: `${designToDelete?.name} has been removed from your catalog.`,
+      });
+    } catch (error) {
+      console.error('Failed to delete design:', error);
+      toast({
+        title: "Error deleting design",
+        description: "Failed to delete the design from the database.",
+        variant: "destructive",
       });
     }
   };
 
-  const handleDeleteDesign = (id: number) => {
-    const designToDelete = designs.find(d => d.id === id);
-    onUpdateDesigns(designs.filter(d => d.id !== id));
-    toast({
-      title: "Design deleted",
-      description: `${designToDelete?.name} has been removed from your catalog.`,
-    });
-  };
+  const handleUpdateDesign = async (id: string, updatedDesign: Partial<Design>) => {
+    try {
+      console.log('Updating design:', id, updatedDesign);
+      const { error } = await supabase
+        .from('designs')
+        .update(updatedDesign)
+        .eq('id', id);
 
-  const handleUpdateDesign = (id: number, updatedDesign: Partial<Design>) => {
-    onUpdateDesigns(
-      designs.map(d => d.id === id ? { ...d, ...updatedDesign } : d)
-    );
-    setEditingId(null);
-    toast({
-      title: "Design updated",
-      description: "The design has been successfully updated.",
-    });
+      if (error) {
+        console.error('Error updating design:', error);
+        throw error;
+      }
+
+      console.log('Design updated successfully');
+      setEditingId(null);
+      queryClient.invalidateQueries({ queryKey: ['designs'] });
+      
+      toast({
+        title: "Design updated",
+        description: "The design has been successfully updated.",
+      });
+    } catch (error) {
+      console.error('Failed to update design:', error);
+      toast({
+        title: "Error updating design",
+        description: "Failed to update the design in the database.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -232,7 +298,7 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
     name: design.name,
     price: design.price,
     image: design.image,
-    description: design.description
+    description: design.description || ""
   });
 
   return (
