@@ -14,7 +14,7 @@ const CallToAction = () => {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            to="/contact"
+            to="/custom-design"
             className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200"
           >
             Get Started Today

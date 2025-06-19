@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLogin from "../components/AdminLogin";
 import AdminPanel from "../components/AdminPanel";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 interface Design {
   id: string;
@@ -144,9 +145,9 @@ Thank you!`;
             <p className="text-gray-600 mb-6">
               We specialize in custom 3D printing! Contact us to discuss your unique project.
             </p>
-            <a href="/contact" className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200">
+            <Link to="/custom-design" className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200">
               Request Custom Design
-            </a>
+            </Link>
           </div>
         </div>
       </div>
