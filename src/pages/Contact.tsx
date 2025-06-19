@@ -7,7 +7,9 @@ const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    project: "",
+    design: "",
+    measurements: "",
+    filament: "",
     message: ""
   });
   const { toast } = useToast();
@@ -16,19 +18,19 @@ const Contact = () => {
     e.preventDefault();
     
     // Create email with form data
-    const subject = `Quote Request from ${formData.name}`;
+    const subject = `Design Request from ${formData.name}`;
     const body = `Hi Nick,
 
-I would like to request a quote for a 3D printing project:
+I would like to request a 3D print design:
 
 Name: ${formData.name}
 Email: ${formData.email}
-Project Type: ${formData.project || 'Not specified'}
+Design Needed: ${formData.design}
+Measurements: ${formData.measurements || 'Not specified'}
+Filament Type: ${formData.filament || 'Not specified'}
 
-Project Details:
+Additional Details:
 ${formData.message}
-
-Please provide a quote and timeline for this project.
 
 Thank you!`;
 
@@ -36,10 +38,10 @@ Thank you!`;
     window.open(emailUrl);
 
     toast({
-      title: "Quote Request Sent!",
-      description: "Your email client should open with the quote request. We'll get back to you within 24 hours.",
+      title: "Request Sent!",
+      description: "Your email client should open with the design request. We'll get back to you soon.",
     });
-    setFormData({ name: "", email: "", project: "", message: "" });
+    setFormData({ name: "", email: "", design: "", measurements: "", filament: "", message: "" });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -59,8 +61,8 @@ Thank you!`;
             </span>
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Ready to start your 3D printing project? Contact us for custom orders, 
-            quotes, or any questions about our services.
+            Need a custom 3D print? Contact us with your design needs, 
+            measurements, and any specific requirements.
           </p>
         </div>
 
@@ -128,7 +130,7 @@ Thank you!`;
 
           {/* Contact Form */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Request a Quote</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Design Request</h2>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
@@ -164,39 +166,69 @@ Thank you!`;
               </div>
 
               <div>
-                <label htmlFor="project" className="block text-sm font-medium text-gray-700 mb-2">
-                  Project Type
+                <label htmlFor="design" className="block text-sm font-medium text-gray-700 mb-2">
+                  What Design Do You Need? *
+                </label>
+                <input
+                  type="text"
+                  id="design"
+                  name="design"
+                  required
+                  value={formData.design}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="e.g., Custom phone case, replacement part, figurine..."
+                />
+              </div>
+
+              <div>
+                <label htmlFor="measurements" className="block text-sm font-medium text-gray-700 mb-2">
+                  Measurements
+                </label>
+                <input
+                  type="text"
+                  id="measurements"
+                  name="measurements"
+                  value={formData.measurements}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="e.g., 10cm x 5cm x 2cm"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="filament" className="block text-sm font-medium text-gray-700 mb-2">
+                  Filament Type (if known)
                 </label>
                 <select
-                  id="project"
-                  name="project"
-                  value={formData.project}
+                  id="filament"
+                  name="filament"
+                  value={formData.filament}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 >
-                  <option value="">Select a project type</option>
-                  <option value="custom-design">Custom Design</option>
-                  <option value="prototype">Prototype</option>
-                  <option value="replacement-part">Replacement Part</option>
-                  <option value="miniature">Miniature/Figurine</option>
-                  <option value="functional-print">Functional Print</option>
-                  <option value="other">Other</option>
+                  <option value="">Select filament type</option>
+                  <option value="PLA">PLA</option>
+                  <option value="ABS">ABS</option>
+                  <option value="PETG">PETG</option>
+                  <option value="TPU">TPU (Flexible)</option>
+                  <option value="Other">Other</option>
+                  <option value="Not sure">Not sure</option>
                 </select>
               </div>
 
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Project Details *
+                  Additional Details
                 </label>
                 <textarea
                   id="message"
                   name="message"
-                  required
-                  rows={5}
+                  rows={4}
                   value={formData.message}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
-                  placeholder="Please describe your project in detail. Include dimensions, materials, quantity, timeline, and any special requirements..."
+                  placeholder="Any additional details, color preferences, special requirements..."
                 />
               </div>
 
@@ -204,12 +236,12 @@ Thank you!`;
                 type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200"
               >
-                Send Quote Request
+                Send Request
               </button>
             </form>
 
             <p className="text-sm text-gray-600 mt-4 text-center">
-              * We typically respond within 24 hours with a detailed quote and timeline.
+              * We'll get back to you with details about your custom design request.
             </p>
           </div>
         </div>
