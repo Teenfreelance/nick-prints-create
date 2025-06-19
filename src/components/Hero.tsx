@@ -13,6 +13,10 @@ Design Needed: [Please describe what you need]
 Measurements: [Please provide measurements if known]
 Filament Type: [Please specify if you have a preference]
 
+Do you already have a design file? 
+☐ Yes - I will attach the file(s) to this email
+☐ No - I need you to create the design from scratch
+
 Additional Details:
 [Any additional information or requirements]
 
