@@ -1,6 +1,11 @@
 
+import { useState } from "react";
+import AdminLogin from "../components/AdminLogin";
+import AdminPanel from "../components/AdminPanel";
+
 const PremadeDesigns = () => {
-  const designs = [
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [designs, setDesigns] = useState([
     {
       id: 1,
       name: "Robot Toy",
@@ -43,7 +48,19 @@ const PremadeDesigns = () => {
       image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=400&h=400&fit=crop",
       description: "Detailed miniature figurine perfect for gaming or display."
     }
-  ];
+  ]);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
+  const handleUpdateDesigns = (newDesigns: typeof designs) => {
+    setDesigns(newDesigns);
+  };
 
   return (
     <div className="min-h-screen py-12">
@@ -59,6 +76,24 @@ const PremadeDesigns = () => {
             and ready to ship within 2-3 business days.
           </p>
         </div>
+
+        {/* Admin Section */}
+        {!isLoggedIn ? (
+          <div className="mb-8">
+            <details className="max-w-md mx-auto">
+              <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700 text-center">
+                Owner Access
+              </summary>
+              <AdminLogin onLogin={handleLogin} />
+            </details>
+          </div>
+        ) : (
+          <AdminPanel 
+            designs={designs}
+            onUpdateDesigns={handleUpdateDesigns}
+            onLogout={handleLogout}
+          />
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {designs.map((design) => (
