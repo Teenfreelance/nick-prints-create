@@ -1,7 +1,29 @@
+
 import { ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
+
 const Hero = () => {
-  return <div className="relative overflow-hidden">
+  const handleCustomOrderClick = () => {
+    const subject = "Custom 3D Print Design Request";
+    const body = `Hi Nick,
+
+I would like to request a custom 3D print design:
+
+Design Needed: [Please describe what you need]
+Measurements: [Please provide measurements if known]
+Filament Type: [Please specify if you have a preference]
+
+Additional Details:
+[Any additional information or requirements]
+
+Thank you!`;
+
+    const emailUrl = `mailto:grovesn094@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(emailUrl);
+  };
+
+  return (
+    <div className="relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="text-center">
           <div className="mb-8">
@@ -28,9 +50,12 @@ const Hero = () => {
             <Link to="/premade-designs" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-200">
               Browse Designs
             </Link>
-            <Link to="/contact" className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-600 hover:text-white transition-all duration-200">
+            <button 
+              onClick={handleCustomOrderClick}
+              className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-600 hover:text-white transition-all duration-200"
+            >
               Custom Order
-            </Link>
+            </button>
           </div>
           
           <div className="animate-bounce">
@@ -45,6 +70,8 @@ const Hero = () => {
         <div className="absolute top-40 right-20 w-16 h-16 bg-purple-200 rounded-full opacity-50 animate-float-delayed"></div>
         <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-blue-300 rounded-full opacity-50 animate-float"></div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Hero;

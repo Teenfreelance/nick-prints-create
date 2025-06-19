@@ -10,7 +10,6 @@ const Navbar = () => {
   const navigation = [
     { name: "Home", href: "/" },
     { name: "Premade Designs", href: "/premade-designs" },
-    { name: "Contact", href: "/contact" },
   ];
 
   const isActive = (href: string) => location.pathname === href;
