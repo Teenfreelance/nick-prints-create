@@ -1,5 +1,5 @@
 
-import { Phone, Mail, ArrowUp } from "lucide-react";
+import { Phone, Mail, ArrowUp, Upload } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,6 +12,7 @@ const Contact = () => {
     filament: "",
     message: ""
   });
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -19,7 +20,7 @@ const Contact = () => {
     
     // Create email with form data
     const subject = `Design Request from ${formData.name}`;
-    const body = `Hi Nick,
+    let body = `Hi Nick,
 
 I would like to request a 3D print design:
 
@@ -30,18 +31,25 @@ Measurements: ${formData.measurements || 'Not specified'}
 Filament Type: ${formData.filament || 'Not specified'}
 
 Additional Details:
-${formData.message}
+${formData.message}`;
 
-Thank you!`;
+    if (uploadedFile) {
+      body += `\n\nNote: I have attached a reference file (${uploadedFile.name}) to this request.`;
+    }
+
+    body += `\n\nThank you!`;
 
     const emailUrl = `mailto:grovesn094@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(emailUrl);
 
     toast({
       title: "Request Sent!",
-      description: "Your email client should open with the design request. We'll get back to you soon.",
+      description: uploadedFile 
+        ? "Your email client should open with the design request. Don't forget to attach your reference file to the email."
+        : "Your email client should open with the design request. We'll get back to you soon.",
     });
     setFormData({ name: "", email: "", design: "", measurements: "", filament: "", message: "" });
+    setUploadedFile(null);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -49,6 +57,11 @@ Thank you!`;
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setUploadedFile(file);
   };
 
   return (
@@ -215,6 +228,33 @@ Thank you!`;
                   <option value="Other">Other</option>
                   <option value="Not sure">Not sure</option>
                 </select>
+              </div>
+
+              <div>
+                <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
+                  Reference File (optional)
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    id="file"
+                    onChange={handleFileChange}
+                    accept=".jpg,.jpeg,.png,.pdf,.stl,.obj,.step,.dwg"
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="file"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors cursor-pointer flex items-center justify-center space-x-2 hover:bg-gray-50"
+                  >
+                    <Upload size={20} className="text-gray-500" />
+                    <span className="text-gray-600">
+                      {uploadedFile ? uploadedFile.name : "Upload reference image or design file"}
+                    </span>
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Supported formats: JPG, PNG, PDF, STL, OBJ, STEP, DWG (Max 10MB)
+                </p>
               </div>
 
               <div>
