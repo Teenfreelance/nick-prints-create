@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Edit, Trash2, Upload } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Edit, Trash2, Upload, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -313,27 +314,67 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
     image: design.image,
     description: design.description || ""
   });
+  const [editMode, setEditMode] = useState<string>("");
+
+  const handleFieldChange = (field: string, value: string) => {
+    setEditData({...editData, [field]: value});
+  };
+
+  const handleSave = () => {
+    const priceWithSymbol = editData.price.startsWith('$') ? editData.price : `$${editData.price}`;
+    onSave({...editData, price: priceWithSymbol});
+  };
 
   return (
-    <div className="flex-1 w-full">
-      <div className="grid grid-cols-1 gap-4 p-4 bg-gray-50 rounded-lg">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="flex-1 w-full bg-gray-50 rounded-lg p-4">
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Label className="text-sm font-semibold text-gray-700">Edit Field:</Label>
+          <Select value={editMode} onValueChange={setEditMode}>
+            <SelectTrigger className="w-48 bg-white">
+              <SelectValue placeholder="Select field to edit" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border shadow-lg z-50">
+              <SelectItem value="name">Product Name</SelectItem>
+              <SelectItem value="price">Price</SelectItem>
+              <SelectItem value="image">Image</SelectItem>
+              <SelectItem value="description">Description</SelectItem>
+              <SelectItem value="all">Edit All Fields</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Show current values */}
+        <div className="bg-white p-3 rounded border">
+          <div className="text-xs text-gray-500 mb-2">Current Values:</div>
+          <div className="text-sm space-y-1">
+            <div><strong>Name:</strong> {design.name}</div>
+            <div><strong>Price:</strong> {design.price}</div>
+            <div><strong>Description:</strong> {design.description || "No description"}</div>
+          </div>
+        </div>
+
+        {/* Edit fields based on selection */}
+        {editMode === "name" && (
           <div>
             <Label className="text-sm font-medium text-gray-700">Product Name</Label>
             <Input
               value={editData.name}
-              onChange={(e) => setEditData({...editData, name: e.target.value})}
+              onChange={(e) => handleFieldChange("name", e.target.value)}
               placeholder="Enter product name"
               className="mt-1"
             />
           </div>
+        )}
+
+        {editMode === "price" && (
           <div>
             <Label className="text-sm font-medium text-gray-700">Price</Label>
             <div className="relative mt-1">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
               <Input
                 value={editData.price.replace('$', '')}
-                onChange={(e) => setEditData({...editData, price: e.target.value})}
+                onChange={(e) => handleFieldChange("price", e.target.value)}
                 placeholder="24.99"
                 className="pl-7"
                 type="number"
@@ -342,56 +383,132 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
               />
             </div>
           </div>
-        </div>
-        
-        <div>
-          <Label className="text-sm font-medium text-gray-700">Image URL</Label>
-          <div className="flex gap-2 mt-1">
-            <Input
-              value={editData.image}
-              onChange={(e) => setEditData({...editData, image: e.target.value})}
-              placeholder="https://example.com/image.jpg"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => document.getElementById(`edit-upload-${design.id}`)?.click()}
-            >
-              <Upload size={14} />
-            </Button>
-            <input
-              id={`edit-upload-${design.id}`}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) onImageUpload(file);
-              }}
+        )}
+
+        {editMode === "image" && (
+          <div>
+            <Label className="text-sm font-medium text-gray-700">Image</Label>
+            <div className="flex gap-2 mt-1">
+              <Input
+                value={editData.image}
+                onChange={(e) => handleFieldChange("image", e.target.value)}
+                placeholder="https://example.com/image.jpg"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => document.getElementById(`edit-upload-${design.id}`)?.click()}
+              >
+                <Upload size={14} />
+              </Button>
+              <input
+                id={`edit-upload-${design.id}`}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) onImageUpload(file);
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {editMode === "description" && (
+          <div>
+            <Label className="text-sm font-medium text-gray-700">Description</Label>
+            <textarea
+              value={editData.description}
+              onChange={(e) => handleFieldChange("description", e.target.value)}
+              placeholder="Enter product description..."
+              className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              rows={4}
             />
           </div>
-        </div>
-        
-        <div>
-          <Label className="text-sm font-medium text-gray-700">Description</Label>
-          <textarea
-            value={editData.description}
-            onChange={(e) => setEditData({...editData, description: e.target.value})}
-            placeholder="Enter product description..."
-            className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-            rows={3}
-          />
-        </div>
-        
-        <div className="flex gap-2 pt-2 border-t">
-          <Button onClick={() => onSave({...editData, price: editData.price.startsWith('$') ? editData.price : `$${editData.price}`})} size="sm" className="bg-green-600 hover:bg-green-700">
-            Save Changes
-          </Button>
-          <Button onClick={onCancel} variant="outline" size="sm">
-            Cancel
-          </Button>
-        </div>
+        )}
+
+        {editMode === "all" && (
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Product Name</Label>
+              <Input
+                value={editData.name}
+                onChange={(e) => handleFieldChange("name", e.target.value)}
+                placeholder="Enter product name"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Price</Label>
+              <div className="relative mt-1">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                <Input
+                  value={editData.price.replace('$', '')}
+                  onChange={(e) => handleFieldChange("price", e.target.value)}
+                  placeholder="24.99"
+                  className="pl-7"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Image</Label>
+              <div className="flex gap-2 mt-1">
+                <Input
+                  value={editData.image}
+                  onChange={(e) => handleFieldChange("image", e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById(`edit-upload-${design.id}`)?.click()}
+                >
+                  <Upload size={14} />
+                </Button>
+                <input
+                  id={`edit-upload-${design.id}`}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) onImageUpload(file);
+                  }}
+                />
+              </div>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Description</Label>
+              <textarea
+                value={editData.description}
+                onChange={(e) => handleFieldChange("description", e.target.value)}
+                placeholder="Enter product description..."
+                className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                rows={3}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Action buttons - only show if a field is selected */}
+        {editMode && (
+          <div className="flex gap-2 pt-4 border-t">
+            <Button onClick={handleSave} size="sm" className="bg-green-600 hover:bg-green-700">
+              <Save size={14} className="mr-1" />
+              Save Changes
+            </Button>
+            <Button onClick={onCancel} variant="outline" size="sm">
+              <X size={14} className="mr-1" />
+              Cancel
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
