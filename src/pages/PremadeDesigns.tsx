@@ -24,10 +24,9 @@ const PremadeDesigns = () => {
   const { data: designs = [], isLoading, error } = useQuery({
     queryKey: ['designs'],
     queryFn: async () => {
-      console.log('Fetching designs from Supabase...');
       const { data, error } = await supabase
         .from('designs')
-        .select('*')
+        .select('id, name, price, image, description')
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -35,9 +34,11 @@ const PremadeDesigns = () => {
         throw error;
       }
 
-      console.log('Fetched designs:', data);
       return data as Design[];
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
   });
 
   const handleUpdateDesigns = async (newDesigns: Design[]) => {
@@ -109,14 +110,27 @@ Thank you!`;
 
         {isLoading ? (
           <div className="text-center py-12">
-            <p className="text-gray-600">Loading designs...</p>
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="text-gray-600 mt-4">Loading designs...</p>
+          </div>
+        ) : designs.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600">No designs available yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {designs.map(design => (
               <div key={design.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div className="aspect-square overflow-hidden">
-                  <img src={design.image} alt={design.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                <div className="aspect-square overflow-hidden bg-gray-100">
+                  <img 
+                    src={design.image} 
+                    alt={design.name} 
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=400&fit=crop';
+                    }}
+                  />
                 </div>
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
