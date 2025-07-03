@@ -13,6 +13,7 @@ interface Design {
   price: string;
   image: string;
   description: string | null;
+  square_payment_link: string | null;
 }
 
 const PremadeDesigns = () => {
@@ -26,7 +27,7 @@ const PremadeDesigns = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('designs')
-        .select('id, name, price, image, description')
+        .select('id, name, price, image, description, square_payment_link')
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -55,8 +56,11 @@ const PremadeDesigns = () => {
   };
 
   const handleOrderClick = (design: Design) => {
-    const subject = `Order Request: ${design.name}`;
-    const body = `Hi Nick,
+    if (design.square_payment_link) {
+      window.open(design.square_payment_link, '_blank');
+    } else {
+      const subject = `Order Request: ${design.name}`;
+      const body = `Hi Nick,
 
 I would like to order the following 3D print:
 
@@ -67,8 +71,9 @@ Description: ${design.description}
 Please let me know the next steps for placing this order.
 
 Thank you!`;
-    const emailUrl = `mailto:grovesn094@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(emailUrl);
+      const emailUrl = `mailto:grovesn094@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(emailUrl);
+    }
   };
 
   useEffect(() => {

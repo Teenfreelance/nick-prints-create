@@ -17,6 +17,7 @@ export type Database = {
           image: string
           name: string
           price: string
+          square_payment_link: string | null
           updated_at: string
         }
         Insert: {
@@ -26,6 +27,7 @@ export type Database = {
           image: string
           name: string
           price: string
+          square_payment_link?: string | null
           updated_at?: string
         }
         Update: {
@@ -35,6 +37,7 @@ export type Database = {
           image?: string
           name?: string
           price?: string
+          square_payment_link?: string | null
           updated_at?: string
         }
         Relationships: []

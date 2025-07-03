@@ -15,6 +15,7 @@ interface Design {
   price: string;
   image: string;
   description: string | null;
+  square_payment_link: string | null;
 }
 
 interface AdminPanelProps {
@@ -29,7 +30,8 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
     name: "",
     price: "",
     image: "",
-    description: ""
+    description: "",
+    square_payment_link: ""
   });
   const [showAddForm, setShowAddForm] = useState(false);
   const { toast } = useToast();
@@ -67,7 +69,8 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
             name: newDesign.name,
             price: formattedPrice,
             image: newDesign.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=400&fit=crop',
-            description: newDesign.description
+            description: newDesign.description,
+            square_payment_link: newDesign.square_payment_link
           }])
           .select();
 
@@ -77,7 +80,7 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
         }
 
         console.log('Design added successfully:', data);
-        setNewDesign({ name: "", price: "", image: "", description: "" });
+        setNewDesign({ name: "", price: "", image: "", description: "", square_payment_link: "" });
         setShowAddForm(false);
         queryClient.invalidateQueries({ queryKey: ['designs'] });
         
@@ -245,6 +248,15 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
                 rows={3}
               />
             </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="square_payment_link">Square Payment Link</Label>
+              <Input
+                id="square_payment_link"
+                value={newDesign.square_payment_link}
+                onChange={(e) => setNewDesign({...newDesign, square_payment_link: e.target.value})}
+                placeholder="https://square.link/..."
+              />
+            </div>
           </div>
           <div className="flex gap-2 mt-4">
             <Button onClick={handleAddDesign}>Add Design</Button>
@@ -312,7 +324,8 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
     name: design.name,
     price: design.price,
     image: design.image,
-    description: design.description || ""
+    description: design.description || "",
+    square_payment_link: design.square_payment_link || ""
   });
   const [editMode, setEditMode] = useState<string>("");
 
@@ -339,6 +352,7 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
               <SelectItem value="price">Price</SelectItem>
               <SelectItem value="image">Image</SelectItem>
               <SelectItem value="description">Description</SelectItem>
+              <SelectItem value="square_payment_link">Square Payment Link</SelectItem>
               <SelectItem value="all">Edit All Fields</SelectItem>
             </SelectContent>
           </Select>
@@ -351,6 +365,7 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
             <div><strong>Name:</strong> {design.name}</div>
             <div><strong>Price:</strong> {design.price}</div>
             <div><strong>Description:</strong> {design.description || "No description"}</div>
+            <div><strong>Square Payment Link:</strong> {design.square_payment_link || "No payment link"}</div>
           </div>
         </div>
 
@@ -429,6 +444,18 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
           </div>
         )}
 
+        {editMode === "square_payment_link" && (
+          <div>
+            <Label className="text-sm font-medium text-gray-700">Square Payment Link</Label>
+            <Input
+              value={editData.square_payment_link}
+              onChange={(e) => handleFieldChange("square_payment_link", e.target.value)}
+              placeholder="https://square.link/..."
+              className="mt-1"
+            />
+          </div>
+        )}
+
         {editMode === "all" && (
           <div className="space-y-4">
             <div>
@@ -491,6 +518,15 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
                 placeholder="Enter product description..."
                 className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 rows={3}
+              />
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Square Payment Link</Label>
+              <Input
+                value={editData.square_payment_link}
+                onChange={(e) => handleFieldChange("square_payment_link", e.target.value)}
+                placeholder="https://square.link/..."
+                className="mt-1"
               />
             </div>
           </div>
