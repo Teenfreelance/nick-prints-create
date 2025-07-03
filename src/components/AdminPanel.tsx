@@ -57,11 +57,14 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
     if (newDesign.name && newDesign.price) {
       try {
         console.log('Adding new design:', newDesign);
+        // Format price with $ symbol
+        const formattedPrice = newDesign.price.startsWith('$') ? newDesign.price : `$${newDesign.price}`;
+        
         const { data, error } = await supabase
           .from('designs')
           .insert([{
             name: newDesign.name,
-            price: newDesign.price,
+            price: formattedPrice,
             image: newDesign.image || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=400&fit=crop',
             description: newDesign.description
           }])
@@ -188,12 +191,19 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
             </div>
             <div>
               <Label htmlFor="price">Price</Label>
-              <Input
-                id="price"
-                value={newDesign.price}
-                onChange={(e) => setNewDesign({...newDesign, price: e.target.value})}
-                placeholder="$00.00"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                <Input
+                  id="price"
+                  value={newDesign.price.replace('$', '')}
+                  onChange={(e) => setNewDesign({...newDesign, price: e.target.value})}
+                  placeholder="24.99"
+                  className="pl-7"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
             </div>
             <div>
               <Label htmlFor="image">Image</Label>
@@ -308,11 +318,18 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
         onChange={(e) => setEditData({...editData, name: e.target.value})}
         placeholder="Name"
       />
-      <Input
-        value={editData.price}
-        onChange={(e) => setEditData({...editData, price: e.target.value})}
-        placeholder="Price"
-      />
+      <div className="relative">
+        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+        <Input
+          value={editData.price.replace('$', '')}
+          onChange={(e) => setEditData({...editData, price: e.target.value})}
+          placeholder="24.99"
+          className="pl-7"
+          type="number"
+          step="0.01"
+          min="0"
+        />
+      </div>
       <div className="flex gap-2">
         <Input
           value={editData.image}
@@ -344,7 +361,7 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
         placeholder="Description"
       />
       <div className="flex gap-2 md:col-span-2">
-        <Button onClick={() => onSave(editData)} size="sm">Save</Button>
+        <Button onClick={() => onSave({...editData, price: editData.price.startsWith('$') ? editData.price : `$${editData.price}`})} size="sm">Save</Button>
         <Button onClick={onCancel} variant="outline" size="sm">Cancel</Button>
       </div>
     </div>

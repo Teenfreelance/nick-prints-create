@@ -70,14 +70,16 @@ Thank you!`;
     window.open(emailUrl);
   };
 
-  if (error) {
-    console.error('Query error:', error);
-    toast({
-      title: "Error loading designs",
-      description: "Failed to load designs from the database.",
-      variant: "destructive",
-    });
-  }
+  useEffect(() => {
+    if (error) {
+      console.error('Query error:', error);
+      toast({
+        title: "Error loading designs",
+        description: "Failed to load designs from the database.",
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
 
   return (
     <div className="min-h-screen py-12">
