@@ -233,12 +233,15 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
                 />
               </div>
             </div>
-            <div>
+            <div className="md:col-span-2">
               <Label htmlFor="description">Description</Label>
-              <Input
+              <textarea
                 id="description"
                 value={newDesign.description}
                 onChange={(e) => setNewDesign({...newDesign, description: e.target.value})}
+                placeholder="Enter product description..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                rows={3}
               />
             </div>
           </div>
@@ -312,55 +315,74 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
   });
 
   return (
-    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
-      <Input
-        value={editData.name}
-        onChange={(e) => setEditData({...editData, name: e.target.value})}
-        placeholder="Name"
-      />
-      <div className="relative">
-        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-        <Input
-          value={editData.price.replace('$', '')}
-          onChange={(e) => setEditData({...editData, price: e.target.value})}
-          placeholder="24.99"
-          className="pl-7"
-          type="number"
-          step="0.01"
-          min="0"
+    <div className="flex-1 space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+          <Label className="text-sm font-medium">Name</Label>
+          <Input
+            value={editData.name}
+            onChange={(e) => setEditData({...editData, name: e.target.value})}
+            placeholder="Product name"
+          />
+        </div>
+        <div>
+          <Label className="text-sm font-medium">Price</Label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+            <Input
+              value={editData.price.replace('$', '')}
+              onChange={(e) => setEditData({...editData, price: e.target.value})}
+              placeholder="24.99"
+              className="pl-7"
+              type="number"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <Label className="text-sm font-medium">Image URL</Label>
+        <div className="flex gap-2">
+          <Input
+            value={editData.image}
+            onChange={(e) => setEditData({...editData, image: e.target.value})}
+            placeholder="https://example.com/image.jpg"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => document.getElementById(`edit-upload-${design.id}`)?.click()}
+          >
+            <Upload size={14} />
+          </Button>
+          <input
+            id={`edit-upload-${design.id}`}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onImageUpload(file);
+            }}
+          />
+        </div>
+      </div>
+      
+      <div>
+        <Label className="text-sm font-medium">Description</Label>
+        <textarea
+          value={editData.description}
+          onChange={(e) => setEditData({...editData, description: e.target.value})}
+          placeholder="Product description..."
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          rows={2}
         />
       </div>
-      <div className="flex gap-2">
-        <Input
-          value={editData.image}
-          onChange={(e) => setEditData({...editData, image: e.target.value})}
-          placeholder="Image URL"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => document.getElementById(`edit-upload-${design.id}`)?.click()}
-        >
-          <Upload size={14} />
-        </Button>
-        <input
-          id={`edit-upload-${design.id}`}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) onImageUpload(file);
-          }}
-        />
-      </div>
-      <Input
-        value={editData.description}
-        onChange={(e) => setEditData({...editData, description: e.target.value})}
-        placeholder="Description"
-      />
-      <div className="flex gap-2 md:col-span-2">
+      
+      <div className="flex gap-2 pt-2">
         <Button onClick={() => onSave({...editData, price: editData.price.startsWith('$') ? editData.price : `$${editData.price}`})} size="sm">Save</Button>
         <Button onClick={onCancel} variant="outline" size="sm">Cancel</Button>
       </div>
