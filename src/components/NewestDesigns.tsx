@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface Design {
   id: string;
@@ -104,7 +105,7 @@ Thank you!`;
                     {design.name}
                   </h3>
                   <span className="text-xl font-bold text-primary">
-                    {design.price}
+                    {formatPrice(design.price)}
                   </span>
                 </div>
                 <p className="text-muted-foreground mb-4 line-clamp-2">

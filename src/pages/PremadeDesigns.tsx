@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface Design {
   id: string;
@@ -201,7 +202,7 @@ Thank you!`;
                       {design.name}
                     </h3>
                     <span className="text-2xl font-bold text-primary">
-                      {design.price}
+                      {formatPrice(design.price)}
                     </span>
                   </div>
                   <p className="text-muted-foreground mb-4">

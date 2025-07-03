@@ -8,6 +8,7 @@ import { Plus, Edit, Trash2, Upload, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface Design {
   id: string;
@@ -286,7 +287,7 @@ const AdminPanel = ({ designs, onUpdateDesigns, onLogout }: AdminPanelProps) => 
               <>
                 <div className="flex-1">
                   <h4 className="font-semibold">{design.name}</h4>
-                  <p className="text-gray-600">{design.price}</p>
+                  <p className="text-gray-600">{formatPrice(design.price)}</p>
                   <p className="text-sm text-gray-500">{design.description}</p>
                 </div>
                 <div className="flex gap-2">
@@ -363,7 +364,7 @@ const EditForm = ({ design, onSave, onCancel, onImageUpload }: {
           <div className="text-xs text-gray-500 mb-2">Current Values:</div>
           <div className="text-sm space-y-1">
             <div><strong>Name:</strong> {design.name}</div>
-            <div><strong>Price:</strong> {design.price}</div>
+            <div><strong>Price:</strong> {formatPrice(design.price)}</div>
             <div><strong>Description:</strong> {design.description || "No description"}</div>
             <div><strong>Square Payment Link:</strong> {design.square_payment_link || "No payment link"}</div>
           </div>
