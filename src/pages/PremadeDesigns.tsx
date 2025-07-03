@@ -63,9 +63,6 @@ const PremadeDesigns = () => {
     return matchesSearch && matchesPrice;
   });
 
-  // Get newest designs (first 3)
-  const newestDesigns = allDesigns.slice(0, 3);
-
   const handleUpdateDesigns = async (newDesigns: Design[]) => {
     // Refresh the query to get updated data from Supabase
     queryClient.invalidateQueries({ queryKey: ['designs'] });
@@ -135,49 +132,6 @@ Thank you!`;
           </div>
         ) : (
           <AdminPanel designs={allDesigns} onUpdateDesigns={handleUpdateDesigns} onLogout={handleLogout} />
-        )}
-
-        {/* Newest Designs Section */}
-        {newestDesigns.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-foreground mb-6 text-center">Newest Designs</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {newestDesigns.map(design => (
-                <div key={design.id} className="bg-card rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow duration-300">
-                  <div className="aspect-square overflow-hidden bg-muted">
-                    <img 
-                      src={design.image} 
-                      alt={design.name} 
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=400&fit=crop';
-                      }}
-                    />
-                  </div>
-                  <div className="p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-lg font-semibold text-card-foreground">
-                        {design.name}
-                      </h3>
-                      <span className="text-lg font-bold text-primary">
-                        {design.price}
-                      </span>
-                    </div>
-                    <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-                      {design.description}
-                    </p>
-                    <button 
-                      onClick={() => handleOrderClick(design)} 
-                      className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200"
-                    >
-                      Order Now
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         )}
 
         {/* Search and Filter Section */}
